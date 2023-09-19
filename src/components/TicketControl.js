@@ -3,8 +3,8 @@ import TicketList from './TicketList';
 import EditTicketForm from './EditTicketForm';
 import TicketDetail from './TicketDetail';
 import React, {useEffect, useState} from 'react';
-import db from '../firebase';
-import { collection, addDoc, doc, updateDoc, onSnapshot, deleteDoc } from "firebase/firestore";
+import { db } from '../firebase';
+import { collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc } from "firebase/firestore";
 
 function TicketControl()  {
 
@@ -45,9 +45,8 @@ function TicketControl()  {
     }
   }
 
-  const handleDeletingTicket = (id) => {
-    const newMainTicketList = mainTicketList.filter(ticket => ticket.id !== id);
-    setMainTicketList(newMainTicketList);
+  const handleDeletingTicket = async (id) => {
+    await deleteDoc(doc(db, "tickets", id));
     setSelectedTicket(null);
   }
 
@@ -55,11 +54,9 @@ function TicketControl()  {
    setEditing(true);
   }
 
-  const handleEditingTicketInList = (ticketToEdit) => {
-    const editedMainTicketList = mainTicketList
-      .filter(ticket => ticket.id !== selectedTicket.id)
-      .concat(ticketToEdit);
-    setMainTicketList(editedMainTicketList);
+  const handleEditingTicketInList = async (ticketToEdit) => {
+    const ticketRef = doc(db, "tickets", ticketToEdit.id);
+    await updateDoc(ticketRef, ticketToEdit);
     setEditing(false);
     setSelectedTicket(null);
   }
